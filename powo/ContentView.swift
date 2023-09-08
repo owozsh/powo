@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-let work_time = 10 // 1500
-let rest_time = 5 // 300
-let long_rest_time = 7 // 900
+let work_time = 1500
+let rest_time = 300
+let long_rest_time = 900
 
 struct ContentView: View {
     @State var timeRemaining = work_time
-    @State var isPlaying = true
+    @State var isPlaying = false
     @State var phase = 1
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
@@ -78,7 +78,7 @@ struct ContentView: View {
                     if timeRemaining == 0 {
                         nextPhase()
                     }
-                }.frame(width: 150, height: 80).padding(.bottom).font(.system(size: 32))
+                }.font(.system(size: 48))
             HStack {
                 Button(action: previousPhase) {
                     Image(systemName: "backward.fill")
@@ -90,11 +90,9 @@ struct ContentView: View {
                     Image(systemName: "forward.fill")
                 }
             }.padding(.bottom)
-            Button(action: resetTimer) {
-                Image(systemName: "clock.arrow.circlepath")
-            }
         }
         .padding()
+        .frame(minWidth: 300, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
     }
 }
 
