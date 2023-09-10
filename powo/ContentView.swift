@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import UserNotifications
 
 let work_time = 1500
 let rest_time = 300
@@ -15,6 +16,27 @@ struct ContentView: View {
     @State var timeRemaining = work_time
     @State var isPlaying = false
     @State var phase = 1
+    
+    @State private var permissionGranted = false
+
+    private func requestPermissions() {
+        UNUserNotificationCenter.current().requestAuthorization(options: [.alert, .badge, .sound]) { success, error in
+            if success {
+                permissionGranted = true
+            } else if let error = error {
+                print(error.localizedDescription)
+            }
+        }
+    }
+
+    private func notify(title: String) {
+        let content = UNMutableNotificationContent()
+        content.title = title
+
+        let req = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
+
+        UNUserNotificationCenter.current().add(req)
+    }
     
     let timer = Timer.publish(every: 1, on: .main, in: .common).autoconnect()
     
@@ -34,6 +56,7 @@ struct ContentView: View {
             phase += 1
         }
         
+        notifyPhase()
         timeRemaining = getPhaseTime()
         isPlaying = false
     }
@@ -59,6 +82,29 @@ struct ContentView: View {
             return long_rest_time
         default:
             return work_time
+        }
+    }
+    
+    func notifyPhase() {
+        switch phase {
+        case 1, 3, 5: // work
+            notify(title: "Time to focus!")
+        case 2, 4: // rest
+            notify(title: "Time to rest!")
+        case 6: // long rest
+            notify(title: "Take a break!")
+        default:
+            notify(title: "Time to focus!")
+        }
+    }
+    
+    func getNotificationPermissions() {
+        UNUserNotificationCenter.current().getNotificationSettings { settings in
+            if settings.authorizationStatus == .authorized {
+                permissionGranted = true
+            } else {
+                requestPermissions()
+            }
         }
     }
     
@@ -93,6 +139,9 @@ struct ContentView: View {
         }
         .padding()
         .frame(minWidth: 300, maxWidth: .infinity, minHeight: 300, maxHeight: .infinity)
+        .onAppear {
+            getNotificationPermissions()
+        }
     }
 }
 
