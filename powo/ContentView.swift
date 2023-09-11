@@ -8,9 +8,9 @@
 import SwiftUI
 import UserNotifications
 
-let work_time = 1500
-let rest_time = 300
-let long_rest_time = 900
+let work_time = 15
+let rest_time = 3
+let long_rest_time = 9
 
 struct ContentView: View {
     @State var timeRemaining = work_time
@@ -32,6 +32,7 @@ struct ContentView: View {
     private func notify(title: String) {
         let content = UNMutableNotificationContent()
         content.title = title
+        content.sound = UNNotificationSound.default
 
         let req = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: nil)
 
